@@ -15,28 +15,16 @@
             margin: 0;
             background-color: #f0f0f0;
         }
-        button {
-            padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            margin-top: 20px;
-        }
     </style>
 </head>
 <body>
     <h1>Приглашение в игру</h1>
-    <p>Нажмите кнопку ниже, чтобы открыть игру</p>
-    <button id="openAppButton">Открыть игру</button>
 
     <script>
          const appUrlScheme = 'your-app://'; // Замените на ваш кастомный URL-схема.
         const appStoreUrl = 'https://drive.google.com/uc?export=download&id=1Q09ynvSF1b7rvqfcRWqRCJZEih_20L5E'; // Замените на ссылку на загрузку
 
-        function openApp(deepLink) {
+      function openApp(deepLink) {
             window.location.href = deepLink;
         }
 
@@ -52,22 +40,19 @@
 			})
         }
 
+        // Получаем ID из ссылки
+        const urlParams = new URLSearchParams(window.location.search);
+        const inviteId = urlParams.get('id');
+        let deepLink = appUrlScheme;
+         if (inviteId) {
+            deepLink += "?id=" + inviteId;
+        }
 
-       document.getElementById('openAppButton').addEventListener('click', function () {
-            const urlParams = new URLSearchParams(window.location.search);
-            const inviteId = urlParams.get('id');
-             let deepLink = appUrlScheme;
-            if (inviteId) {
-               deepLink +=  "?id=" + inviteId;
-           }
-
-            checkAppInstalled(function (){
+         checkAppInstalled(function (){
 				openApp(deepLink);
 			}, function (){
 				 window.location.href = appStoreUrl
 			})
-
-        });
 
     </script>
 </body>
