@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Приглашение в игру</title>
-    <style>
+     <style>
         body {
             font-family: sans-serif;
             display: flex;
@@ -15,6 +16,20 @@
             margin: 0;
             background-color: #f0f0f0;
         }
+
+        h1 {
+            color: #333;
+        }
+        p {
+            color: #555;
+             margin-bottom: 20px;
+        }
+
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
         button {
             padding: 10px 20px;
             font-size: 16px;
@@ -23,20 +38,62 @@
             color: white;
             border: none;
             border-radius: 5px;
-            margin-top: 20px;
+            margin-top: 10px;
+        }
+         .button-container button:last-child {
+             margin-bottom: 10px;
+         }
+
+        #footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            padding: 10px;
+            text-align: center;
+            background-color: #ddd;
+        }
+
+        #footer a {
+            color: #007bff;
+            text-decoration: none;
         }
     </style>
+     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js"></script>
 </head>
+
 <body>
-    <h1>Приглашение в игру</h1>
-    <p>Нажмите кнопку ниже, чтобы открыть игру</p>
-    <button id="openAppButton">Открыть игру</button>
+     <div class="container">
+        <h1>Приглашение в игру</h1>
+        <p id="appMessage">Нажмите кнопку ниже, чтобы открыть игру</p>
+          <div class="button-container">
+            <button id="openAppButton">Открыть игру</button>
+            <button id="downloadButton" style="display: none;">Скачать приложение</button>
+          </div>
+      </div>
+
+    <div id="footer">
+        Телеграмм канал: <a href="https://t.me/vilmorydeveloper">vilmorydeveloper</a>
+    </div>
 
     <script>
-         const appUrlScheme = 'your-app://'; // Замените на ваш кастомный URL-схема.
-        const appStoreUrl = 'https://drive.google.com/uc?export=download&id=1MGJHpTP_V19uH7xO4hFawClxJlnn8zb_'; // Замените на ссылку на загрузку
+     // Initialize Firebase (Replace with your Firebase config)
+    const firebaseConfig = {
+     //Your Firebase config
+    };
 
-        function openApp(deepLink) {
+
+    firebase.initializeApp(firebaseConfig);
+     const auth = firebase.auth();
+
+        const apiUrl = 'https://your-api-url.com/Referral/invite'; // Замените на URL вашего API.
+        const appUrlScheme = 'your-app://'; // Ваш URL схема.
+         const appStoreUrl = 'https://your-app-download-link.com'; // Ваша ссылка на скачивание.
+        const openAppButton = document.getElementById('openAppButton');
+         const downloadButton = document.getElementById('downloadButton');
+         const appMessage = document.getElementById('appMessage');
+
+         function openApp(deepLink) {
             window.location.href = deepLink;
         }
 
@@ -52,23 +109,35 @@
 			})
         }
 
-
-       document.getElementById('openAppButton').addEventListener('click', function () {
+        async function handleOpenAISignIn(){
+            const provider = new firebase.auth.GoogleAuthProvider();
+           try{
+             await  auth.signInWithPopup(provider)
+                alert("вы успешно авторизовались!")
+           } catch (e){
+               alert(e.message);
+           }
+        }
+       openAppButton.addEventListener('click',  function() {
             const urlParams = new URLSearchParams(window.location.search);
             const inviteId = urlParams.get('id');
              let deepLink = appUrlScheme;
             if (inviteId) {
                deepLink +=  "?id=" + inviteId;
            }
-
-            checkAppInstalled(function (){
+             checkAppInstalled(function (){
 				openApp(deepLink);
 			}, function (){
-				 window.location.href = appStoreUrl
+				appMessage.innerText = "Похоже у вас не установлено приложение"
+                openAppButton.style.display = "none";
+				downloadButton.style.display = "block";
 			})
 
-        });
 
+        });
+        downloadButton.addEventListener('click', function (){
+            window.location.href = appStoreUrl
+        })
     </script>
 </body>
 </html>
